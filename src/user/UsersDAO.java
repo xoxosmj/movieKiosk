@@ -48,7 +48,7 @@ public class UserDAO {
 
     public void checkDuplicate(String id, String password){
         try{
-            pstmt = conn.prepareStatement("select * from member where id=? and password=?");
+            pstmt = conn.prepareStatement("select * from users where user_id=? and password=?");
             pstmt.setString(1,id);
             pstmt.setString(2,password);
         }catch(SQLException e){
@@ -58,7 +58,7 @@ public class UserDAO {
     public void join(UserDTO userDTO){
         this.getConnection();
         try{
-            checkDuplicate(userDTO.getId(),userDTO.getPassword());
+            checkDuplicate(userDTO.getUser_id(),userDTO.getPassword());
             rs = pstmt.executeQuery();
 
             if(rs.next()){
@@ -66,16 +66,16 @@ public class UserDAO {
             }
             else{
                 try{
-                    pstmt = conn.prepareStatement("insert into member values (?,?,?)");
-                    pstmt.setString(1,userDTO.getId());
+                    pstmt = conn.prepareStatement("INSERT INTO users (user_id, password, age) VALUES (?, ?, ?)");
+                    pstmt.setString(1,userDTO.getUser_id());
                     pstmt.setString(2, userDTO.getPassword());
                     pstmt.setString(3, String.valueOf(userDTO.getAge()));
-                    rs = pstmt.executeQuery();
 
-                    if(rs.next()){
+
+                    int result = pstmt.executeUpdate();
+                    if (result > 0) {
                         System.out.println("회원 가입이 완료되었습니다.");
-                    }
-                    else{
+                    } else {
                         System.out.println("회원가입에 실패하였습니다.");
                     }
                 } catch (SQLException e){
@@ -104,6 +104,7 @@ public class UserDAO {
         }catch (SQLException e) {
             e.printStackTrace();
         }
+        closeConnection();
     }
 
 }

@@ -8,7 +8,7 @@ import lombok.*;
 public class UserDTO {
 
     @NonNull
-    private String id;
+    private String user_id;
     @NonNull
     private String password;
     @NonNull
