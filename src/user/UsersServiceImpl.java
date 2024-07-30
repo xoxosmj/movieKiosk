@@ -1,5 +1,6 @@
 package user;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class UsersServiceImpl implements UsersService {
@@ -14,10 +15,19 @@ public class UsersServiceImpl implements UsersService {
         System.out.print("비밀번호를 입력하시오 : ");
         String userPassword = scanner.next();
 
-        System.out.print("나이를 입력하시오 : ");
-        int age = scanner.nextInt();
 
-        UsersDAO.getInstance().join(new UsersDTO(userId,userPassword,age));
+        while(true){
+            try{
+                System.out.print("나이를 입력하시오 : ");
+                int age = scanner.nextInt();
+
+                UsersDAO.getInstance().join(new UsersDTO(userId, userPassword, age));
+                break;
+            }catch (InputMismatchException e){
+                System.out.println("잘못된 형식의 나이 입력입니다.");
+                scanner.nextLine();
+            }
+        }
     }
 
     @Override
