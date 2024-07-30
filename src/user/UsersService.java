@@ -1,6 +1,6 @@
 package user;
 
-public interface UserService {
+public interface UsersService {
     public void join();
     public void login();
 }

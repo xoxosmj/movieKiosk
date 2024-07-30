@@ -1,12 +1,12 @@
 package main;
 
-import user.UserService;
-import user.UserServiceImpl;
+import user.UsersService;
+import user.UsersServiceImpl;
 
 public class Main {
 
     public static void main(String[] args) {
-        UserService userService = new UserServiceImpl();
+        UsersService userService = new UsersServiceImpl();
         MainServiceImpl mainService = new MainServiceImpl(userService);
         mainService.execute();
     }

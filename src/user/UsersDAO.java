@@ -1,9 +1,8 @@
 package user;
 
 import java.sql.*;
-import java.util.Scanner;
 
-public class UserDAO {
+public class UsersDAO {
     private final String driver = "oracle.jdbc.driver.OracleDriver";
     private final String url = "jdbc:oracle:thin:@localhost:1521:XE";
     private final String user = "C##java";
@@ -13,9 +12,9 @@ public class UserDAO {
     private PreparedStatement pstmt;
     private ResultSet rs;
 
-    private static UserDAO instance = new UserDAO();
+    private static UsersDAO instance = new UsersDAO();
 
-    public UserDAO() {
+    public UsersDAO() {
         try{
             Class.forName(driver);
             System.out.println("driver loading");
@@ -23,7 +22,7 @@ public class UserDAO {
             e.printStackTrace();
         }
     }
-    public static UserDAO getInstance() {
+    public static UsersDAO getInstance() {
         return instance;
     }
 
@@ -48,17 +47,16 @@ public class UserDAO {
 
     public void checkDuplicate(String id, String password){
         try{
-            pstmt = conn.prepareStatement("select * from users where user_id=? and password=?");
+            pstmt = conn.prepareStatement("select * from users where user_id=?");
             pstmt.setString(1,id);
-            pstmt.setString(2,password);
         }catch(SQLException e){
             e.printStackTrace();
         }
     }
-    public void join(UserDTO userDTO){
+    public void join(UsersDTO usersDTO){
         this.getConnection();
         try{
-            checkDuplicate(userDTO.getUser_id(),userDTO.getPassword());
+            checkDuplicate(usersDTO.getUser_id(), usersDTO.getPassword());
             rs = pstmt.executeQuery();
 
             if(rs.next()){
@@ -67,9 +65,9 @@ public class UserDAO {
             else{
                 try{
                     pstmt = conn.prepareStatement("INSERT INTO users (user_id, password, age) VALUES (?, ?, ?)");
-                    pstmt.setString(1,userDTO.getUser_id());
-                    pstmt.setString(2, userDTO.getPassword());
-                    pstmt.setString(3, String.valueOf(userDTO.getAge()));
+                    pstmt.setString(1, usersDTO.getUser_id());
+                    pstmt.setString(2, usersDTO.getPassword());
+                    pstmt.setString(3, String.valueOf(usersDTO.getAge()));
 
 
                     int result = pstmt.executeUpdate();

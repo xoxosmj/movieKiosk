@@ -3,7 +3,7 @@ package main;
 
 
 import lombok.RequiredArgsConstructor;
-import user.UserService;
+import user.UsersService;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 @RequiredArgsConstructor
 public class MainServiceImpl implements MainService{
-    private final UserService userService;
+    private final UsersService userService;
     private Scanner scanner = new Scanner(System.in);
     private boolean end;
 
@@ -56,6 +56,7 @@ public class MainServiceImpl implements MainService{
                 }
             }catch(InputMismatchException e){
                 System.out.println("잘못된 입력값입니다. 다시 입력해주세요");
+                scanner.nextLine();
             }
         }
 

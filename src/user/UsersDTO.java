@@ -5,7 +5,7 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
-public class UserDTO {
+public class UsersDTO {
 
     @NonNull
     private String user_id;

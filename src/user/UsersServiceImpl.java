@@ -2,7 +2,7 @@ package user;
 
 import java.util.Scanner;
 
-public class UserServiceImpl implements UserService {
+public class UsersServiceImpl implements UsersService {
     private Scanner scanner = new Scanner(System.in);
 
 
@@ -17,7 +17,7 @@ public class UserServiceImpl implements UserService {
         System.out.print("나이를 입력하시오 : ");
         int age = scanner.nextInt();
 
-        UserDAO.getInstance().join(new UserDTO(userId,userPassword,age));
+        UsersDAO.getInstance().join(new UsersDTO(userId,userPassword,age));
     }
 
     @Override
@@ -28,6 +28,6 @@ public class UserServiceImpl implements UserService {
         System.out.print("비밀번호를 입력하시오 : ");
         String userPassword = scanner.next();
 
-        UserDAO.getInstance().login(userId,userPassword);
+        UsersDAO.getInstance().login(userId,userPassword);
     }
 }
