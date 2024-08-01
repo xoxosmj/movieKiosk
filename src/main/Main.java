@@ -1,7 +1,7 @@
 package main;
 
-import user.UsersService;
-import user.UsersServiceImpl;
+import users.UsersService;
+import users.UsersServiceImpl;
 
 public class Main {
 

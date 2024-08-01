@@ -3,7 +3,7 @@ package main;
 
 
 import lombok.RequiredArgsConstructor;
-import user.UsersService;
+import users.UsersService;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -13,13 +13,13 @@ import java.util.Scanner;
 public class MainServiceImpl implements MainService{
     private final UsersService userService;
     private Scanner scanner = new Scanner(System.in);
-    private boolean end;
+    private boolean end = false;
 
     @Override
     public void execute() {
         while (true) {
             if(end){
-                System.out.println("프로그램을 종료합니다.");
+                System.out.println("프로그램을 종료합니다."); break;
             }
             loginPage();
         }
@@ -58,6 +58,7 @@ public class MainServiceImpl implements MainService{
                 System.out.println("잘못된 입력값입니다. 다시 입력해주세요");
                 scanner.nextLine();
             }
+
         }
 
 

@@ -1,4 +1,6 @@
-package user;
+package users;
+
+import jdbc.JdbcDAO;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -21,7 +23,7 @@ public class UsersServiceImpl implements UsersService {
                 System.out.print("나이를 입력하시오 : ");
                 int age = scanner.nextInt();
 
-                UsersDAO.getInstance().join(new UsersDTO(userId, userPassword, age));
+                JdbcDAO.getInstance().join(new UsersDTO(userId, userPassword, age));
                 break;
             }catch (InputMismatchException e){
                 System.out.println("잘못된 형식의 나이 입력입니다.");
@@ -38,6 +40,6 @@ public class UsersServiceImpl implements UsersService {
         System.out.print("비밀번호를 입력하시오 : ");
         String userPassword = scanner.next();
 
-        UsersDAO.getInstance().login(userId,userPassword);
+        JdbcDAO.getInstance().login(userId,userPassword);
     }
 }
