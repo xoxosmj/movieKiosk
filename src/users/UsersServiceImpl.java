@@ -6,40 +6,49 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class UsersServiceImpl implements UsersService {
-    private Scanner scanner = new Scanner(System.in);
+    private Scanner sc = new Scanner(System.in);
 
 
     @Override
-    public void join() {
-        System.out.print("아이디를 입력하시오 : ");
-        String userId = scanner.next();
-
-        System.out.print("비밀번호를 입력하시오 : ");
-        String userPassword = scanner.next();
-
-
+    public String join() {
         while (true) {
             try {
-                System.out.print("나이를 입력하시오 : ");
-                int userAge = scanner.nextInt();
+                System.out.print("아이디를 입력하시오 : ");
+                String userId = sc.next();
 
-                JdbcDAO.getInstance().join(new UsersDTO(userId, userPassword, userAge));
-                break;
+                System.out.print("비밀번호를 입력하시오 : ");
+                String userPassword = sc.next();
+
+
+                System.out.print("나이를 입력하시오 : ");
+                int userAge = sc.nextInt();
+
+                boolean result = JdbcDAO.getInstance().join(new UsersDTO(userId, userPassword, userAge));
+
+                if (result) {
+                    return userId;
+                }
             } catch (InputMismatchException e) {
                 System.out.println("잘못된 형식의 나이 입력입니다.");
-                scanner.nextLine();
+                sc.nextLine();
             }
         }
+
     }
 
     @Override
-    public void login() {
+    public String login() {
+        String exit = "";
         System.out.print("아이디를 입력하시오 : ");
-        String userId = scanner.next();
+        String userId = sc.next();
 
         System.out.print("비밀번호를 입력하시오 : ");
-        String userPassword = scanner.next();
+        String userPassword = sc.next();
 
-        JdbcDAO.getInstance().login(userId, userPassword);
+        boolean result = JdbcDAO.getInstance().login(userId, userPassword);
+        if (result) {
+            exit = userId;
+        }
+        return exit;
     }
 }

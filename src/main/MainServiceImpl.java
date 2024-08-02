@@ -2,9 +2,9 @@ package main;
 
 
 import lombok.RequiredArgsConstructor;
+import reservation.ReservationMain;
 import users.UsersService;
 
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 
@@ -12,60 +12,59 @@ import java.util.Scanner;
 public class MainServiceImpl implements MainService {
     private final UsersService userService;
     private Scanner sc = new Scanner(System.in);
-    private boolean end = false;
 
     @Override
     public void execute() {
         while (true) {
-            if (end) {
-                System.out.println("프로그램을 종료합니다.");
-                break;
+
+            String returnId = loginPage();
+
+            if (returnId.equals("")) {
+                System.out.println("프로그램 종료");
+                return;
             }
-            loginPage();
+            ReservationMain reservationMain = new ReservationMain();
+            reservationMain.Reservation(returnId);
         }
     }
 
-    public void loginPage() {
-        System.out.println("*************************************");
-        System.out.println("*                                   *");
-        System.out.println("*        Welcome to Movie Kiosk     *");
-        System.out.println("*                                   *");
-        System.out.println("*************************************");
-        System.out.println();
-        System.out.println("1. 로그인");
-        System.out.println("2. 회원가입");
-        System.out.println("3. 프로그램 종료.");
-        System.out.print("메뉴를 선택해주세요 : ");
+    public String loginPage() {
+        String returnId;
 
-        boolean exit = false;
         while (true) {
-            try {
-                if (exit) break;
-                int select = sc.nextInt();
+            System.out.println("*************************************");
+            System.out.println("*                                   *");
+            System.out.println("*        Welcome to Movie Kiosk     *");
+            System.out.println("*                                   *");
+            System.out.println("*************************************");
+            System.out.println();
+            System.out.println("1. 로그인");
+            System.out.println("2. 회원가입");
+            System.out.println("3. 프로그램 종료.");
+            System.out.print("메뉴를 선택해주세요 : ");
+            int choice = sc.nextInt();
 
-                switch (select) {
-                    case 1:
-                        exit = true;
-                        userService.login();
-                        break;
-                    case 2:
-                        exit = true;
-                        userService.join();
-                        break;
-                    case 3:
-                        end = true;
-                        break;
-                    default:
-                        System.out.println("메뉴에 없는 입력값입니다. 다시 입력해주세요");
-                        break;
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("잘못된 입력값입니다. 다시 입력해주세요");
-                sc.nextLine();
+            switch (choice) {
+                case 3:
+                    return "";
+
+                case 1:
+                    returnId = userService.login();
+                    if (!returnId.equals("")) {
+                        return returnId;
+                    }
+                    break;
+                case 2:
+                    returnId = userService.join();
+                    if (!returnId.equals("")) {
+                        return returnId;
+                    }
+                    break;
+                default:
+                    System.out.println("올바른 번호를 입력하세요");
+                    break;
             }
-
         }
-
 
     }
 }

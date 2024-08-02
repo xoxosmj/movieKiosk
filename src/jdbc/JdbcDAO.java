@@ -77,8 +77,9 @@ public class JdbcDAO {
 
     }
 
-    public void join(UsersDTO usersDTO) {
+    public boolean join(UsersDTO usersDTO) {
         this.getConnection();
+        boolean result = false;
         try {
             checkDuplicate(usersDTO.getUserId());
             rs = pstmt.executeQuery();
@@ -93,11 +94,14 @@ public class JdbcDAO {
                     pstmt.setString(3, String.valueOf(usersDTO.getUserAge()));
 
 
-                    int result = pstmt.executeUpdate();
-                    if (result > 0) {
+                    int su = pstmt.executeUpdate();
+                    if (su > 0) {
                         System.out.println("회원 가입이 완료되었습니다.\n");
+                        result = true;
+
                     } else {
                         System.out.println("회원가입에 실패하였습니다.\n");
+                        result =  false;
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -108,23 +112,29 @@ public class JdbcDAO {
             e.printStackTrace();
         }
         closeConnection();
+        return result;
+
     }
 
-    public void login(String id, String password) {
+    public boolean login(String id, String password) {
         this.getConnection();
+        boolean result = false;
         try {
             checkPassword(id, password);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
                 System.out.println("로그인에 성공합니다.\n");
+                result= true;
             } else {
                 System.out.println("아이디 혹은 비밀번호가 맞지 않습니다.\n");
+                result= false;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         closeConnection();
+        return result;
     }
 
 
