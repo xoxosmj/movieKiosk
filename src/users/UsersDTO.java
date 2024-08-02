@@ -10,7 +10,7 @@ import lombok.NonNull;
 public class UsersDTO {
 
     @NonNull
-    private String userID;
+    private String userId;
     @NonNull
     private String userPassword;
     @NonNull

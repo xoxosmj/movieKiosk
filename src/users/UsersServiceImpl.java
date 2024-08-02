@@ -12,7 +12,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public void join() {
         System.out.print("아이디를 입력하시오 : ");
-        String userID = scanner.next();
+        String userId = scanner.next();
 
         System.out.print("비밀번호를 입력하시오 : ");
         String userPassword = scanner.next();
@@ -23,7 +23,7 @@ public class UsersServiceImpl implements UsersService {
                 System.out.print("나이를 입력하시오 : ");
                 int userAge = scanner.nextInt();
 
-                JdbcDAO.getInstance().join(new UsersDTO(userID, userPassword, userAge));
+                JdbcDAO.getInstance().join(new UsersDTO(userId, userPassword, userAge));
                 break;
             } catch (InputMismatchException e) {
                 System.out.println("잘못된 형식의 나이 입력입니다.");

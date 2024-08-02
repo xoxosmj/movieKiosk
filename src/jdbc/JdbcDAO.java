@@ -58,7 +58,7 @@ public class JdbcDAO {
     // USERS
     public void checkDuplicate(String id, String password) {
         try {
-            pstmt = conn.prepareStatement("select * from users where username=?");
+            pstmt = conn.prepareStatement("select * from users where user_id=?");
             pstmt.setString(1, id);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -68,15 +68,15 @@ public class JdbcDAO {
     public void join(UsersDTO usersDTO) {
         this.getConnection();
         try {
-            checkDuplicate(usersDTO.getUserID(), usersDTO.getUserPassword());
+            checkDuplicate(usersDTO.getUserId(), usersDTO.getUserPassword());
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
                 System.out.println("이미 기존에 있는 회원입니다.");
             } else {
                 try {
-                    pstmt = conn.prepareStatement("INSERT INTO users (user_id,username, password, age) VALUES (User_seq.NEXTVAL,?, ?, ?)");
-                    pstmt.setString(1, usersDTO.getUserID());
+                    pstmt = conn.prepareStatement("INSERT INTO users (user_id, password, age) VALUES (?, ?, ?)");
+                    pstmt.setString(1, usersDTO.getUserId());
                     pstmt.setString(2, usersDTO.getUserPassword());
                     pstmt.setString(3, String.valueOf(usersDTO.getUserAge()));
 
