@@ -8,7 +8,7 @@ public class ReservationMain {
         reservationService.selectTheater();
         reservationService.selectMovie();
         reservationService.selectShowTime();
-        // reservationService.insertPeopleNumber();
+        reservationService.insertPeopleNumber();
         reservationService.selectSeats();
     }
 }

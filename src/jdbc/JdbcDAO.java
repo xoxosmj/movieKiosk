@@ -1,5 +1,6 @@
 package jdbc;
 
+import reservation.ReservationDTO;
 import users.UsersDTO;
 
 import java.sql.*;
@@ -121,7 +122,6 @@ public class JdbcDAO {
             pstmt = conn.prepareStatement("select * from theater");
             rs = pstmt.executeQuery();
 
-            int i = 1;
             while (rs.next()) {
                 System.out.println(rs.getString("THEATER_ID") + ". " + rs.getString("NAME")
                         + " (" + rs.getString("LOCATION") + ")");
@@ -158,36 +158,12 @@ public class JdbcDAO {
                     "AS start_time FROM showTime GROUP BY TO_CHAR(start_time, 'HH24:MI')");
 
             rs = pstmt.executeQuery();
+            int i = 1;
             while (rs.next()) {
-                System.out.println("상영 시작 시간: " + rs.getString("start_time"));
+                System.out.println(i + ". 상영 시작 시간: " + rs.getString("start_time"));
+                i++;
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        closeConnection();
-    }
-
-    public void showSeatsTable(int showTimeId) {
-        this.getConnection();
-        try {
-            pstmt = conn.prepareStatement("SELECT s.seat_row, s.seat_number, " +
-                    "       CASE WHEN r.status = 1 THEN '*' ELSE 'ㅁ' END AS seat_status" +
-                    "FROM Seats s" +
-                    "LEFT JOIN Showtime_Seat ss ON s.seat_id = ss.seat_id" +
-                    "LEFT JOIN Reservation r ON ss.showtime_seat_id = r.showtime_seat_id" +
-                    "WHERE ss.showtime_id = ?" +
-                    "ORDER BY s.seat_row, s.seat_number;");
-            pstmt.setString(1, String.valueOf(showTimeId));
-
-            rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                String seatRow = rs.getString("seat_row");
-                int seatNumber = rs.getInt("seat_number");
-                String seatStatus = rs.getString("seat_status");
-                System.out.println(seatRow + seatNumber + ": " + seatStatus);
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -195,16 +171,17 @@ public class JdbcDAO {
     }
 
     public int getShowtimeId(int movieId, int theaterId, String timeString) {
-        int showtimeId = -1;
+        int showtimeId = -1; // -1로 잡은 이유 무엇
         this.getConnection();
         try {
-            String query = "SELECT showtime_id FROM Showtimes_View WHERE movie_id = ? AND theater_id = ? AND start_time_str = ?";
-            pstmt = conn.prepareStatement(query);
+            String sql = "SELECT showtime_id FROM Showtime WHERE movie_id = ? AND theater_id = ? AND TO_CHAR(START_TIME, 'HH24:MI') = ?";
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, movieId);
             pstmt.setInt(2, theaterId);
             pstmt.setString(3, timeString);
 
             rs = pstmt.executeQuery();
+
             if (rs.next()) {
                 showtimeId = rs.getInt("showtime_id");
             }
@@ -216,4 +193,82 @@ public class JdbcDAO {
     }
 
 
+    public void showSeatsTable(int showtimeId) {
+        this.getConnection();
+        String sql = "select seat_id,status from showtime_seat where showtime_id=?";
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, showtimeId);
+            rs = pstmt.executeQuery();
+            int enter = 0;
+            int row = 0;
+            char nextChar = 'A';
+
+            System.out.println("   01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20");
+            System.out.print(nextChar + "  ");
+            while (rs.next()) {
+
+                if (enter == 20) {
+                    enter = 0;
+                    nextChar++;
+                    System.out.println();
+                    System.out.print(nextChar + "  ");
+                }
+                switch (rs.getInt("status")) {
+                    case 1:
+                        System.out.print(" O ");
+                        enter++;
+                        break;
+
+                    default:
+                        System.out.print(" X ");
+                        enter++;
+                        break;
+
+                }
+
+            }
+            System.out.println();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        closeConnection();
+    }
+
+
+    public boolean reservation(ReservationDTO.ShowtimeIdDTO showtimeIdDTO, int showtimeId, String seatRow, int seatNum) {
+        this.getConnection();
+        int seat_id = -1;
+        int showtime_seat_id = -1;
+        boolean reserved = false;
+        try {
+            pstmt = conn.prepareStatement("select seat_id from seats where theater_id = ? and seat_row = ? and seat_number = ?");
+            pstmt.setInt(1, showtimeIdDTO.getTheaterId());
+            pstmt.setString(2, seatRow);
+            pstmt.setInt(3, seatNum);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                seat_id = rs.getInt("seat_id");
+                System.out.println(seat_id);
+            }
+            pstmt = conn.prepareStatement("select showtime_seat_id from showtime_seat where showtime_id=? and seat_id = ? and status = 1");
+            pstmt.setInt(1, showtimeId);
+            pstmt.setInt(2, seat_id);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                showtime_seat_id = rs.getInt("showtime_seat_id");
+                System.out.println(showtime_seat_id);
+                pstmt = conn.prepareStatement("UPDATE Showtime_Seat SET status = 0 WHERE showtime_seat_id = ?");
+                pstmt.setInt(1, showtime_seat_id);
+                pstmt.execute();
+                reserved = true;
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return reserved;
+    }
 }
