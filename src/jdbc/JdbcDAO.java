@@ -7,8 +7,8 @@ import java.sql.*;
 public class JdbcDAO {
     private final String driver = "oracle.jdbc.driver.OracleDriver";
     private final String url = "jdbc:oracle:thin:@localhost:1521:XE";
-    private final String user = "C##java";
-    private final String password = "oracle";
+    private final String user = "c##java";
+    private final String password = "1234";
 
     private Connection conn;
     private PreparedStatement pstmt;
@@ -17,61 +17,68 @@ public class JdbcDAO {
     private static JdbcDAO instance = new JdbcDAO();
 
     public JdbcDAO() {
-        try{
+        try {
             Class.forName(driver);
             System.out.println("driver loading");
-        }catch(ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
+
     public static JdbcDAO getInstance() {
         return instance;
     }
 
-    public void getConnection(){
+    public void getConnection() {
         try {
-            conn = DriverManager.getConnection(url,user,password);
-        }catch(SQLException e){
+            conn = DriverManager.getConnection(url, user, password);
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void closeConnection(){
-        try{
-            if(rs != null){rs.close();}
-            if(pstmt!=null){pstmt.close();}
-            if(conn!=null){conn.close();}
+    public void closeConnection() {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+            if (pstmt != null) {
+                pstmt.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
             System.out.println("connection closed");
-        }catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
 
     // USERS
-    public void checkDuplicate(String id, String password){
-        try{
-            pstmt = conn.prepareStatement("select * from users where user_id=?");
-            pstmt.setString(1,id);
-        }catch(SQLException e){
+    public void checkDuplicate(String id, String password) {
+        try {
+            pstmt = conn.prepareStatement("select * from users where username=?");
+            pstmt.setString(1, id);
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    public void join(UsersDTO usersDTO){
+
+    public void join(UsersDTO usersDTO) {
         this.getConnection();
-        try{
-            checkDuplicate(usersDTO.getUser_id(), usersDTO.getPassword());
+        try {
+            checkDuplicate(usersDTO.getUserID(), usersDTO.getUserPassword());
             rs = pstmt.executeQuery();
 
-            if(rs.next()){
+            if (rs.next()) {
                 System.out.println("이미 기존에 있는 회원입니다.");
-            }
-            else{
-                try{
-                    pstmt = conn.prepareStatement("INSERT INTO users (user_id, password, age) VALUES (?, ?, ?)");
-                    pstmt.setString(1, usersDTO.getUser_id());
-                    pstmt.setString(2, usersDTO.getPassword());
-                    pstmt.setString(3, String.valueOf(usersDTO.getAge()));
+            } else {
+                try {
+                    pstmt = conn.prepareStatement("INSERT INTO users (user_id,username, password, age) VALUES (User_seq.NEXTVAL,?, ?, ?)");
+                    pstmt.setString(1, usersDTO.getUserID());
+                    pstmt.setString(2, usersDTO.getUserPassword());
+                    pstmt.setString(3, String.valueOf(usersDTO.getUserAge()));
 
 
                     int result = pstmt.executeUpdate();
@@ -80,88 +87,90 @@ public class JdbcDAO {
                     } else {
                         System.out.println("회원가입에 실패하였습니다.\n");
                     }
-                } catch (SQLException e){
+                } catch (SQLException e) {
                     e.printStackTrace();
                 }
 
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         closeConnection();
     }
 
-    public void login(String id, String password){
+    public void login(String id, String password) {
         this.getConnection();
-        try{
-            checkDuplicate(id,password);
+        try {
+            checkDuplicate(id, password);
             rs = pstmt.executeQuery();
 
-            if(rs.next()){
+            if (rs.next()) {
                 System.out.println("로그인에 성공합니다.\n");
-            }
-            else{
+            } else {
                 System.out.println("존재하지 않는 회원입니다.\n");
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         closeConnection();
     }
 
-    public void showTheaterList(){
+    public void showTheaterList() {
         this.getConnection();
-        try{
+        try {
             pstmt = conn.prepareStatement("select * from theater");
             rs = pstmt.executeQuery();
 
-            int i= 1;
-            while(rs.next()){
-                System.out.println(rs.getString("THEATER_ID")+". "+rs.getString("NAME")
-                        +" ("+rs.getString("LOCATION")+")");
+            int i = 1;
+            while (rs.next()) {
+                System.out.println(rs.getString("THEATER_ID") + ". " + rs.getString("NAME")
+                        + " (" + rs.getString("LOCATION") + ")");
             }
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         closeConnection();
     }
-    public void showMovieList(){
+
+    public void showMovieList() {
         this.getConnection();
-        try{
+        try {
             pstmt = conn.prepareStatement("select * from movie");
             rs = pstmt.executeQuery();
 
 
-            while(rs.next()){
-                System.out.println(rs.getString("MOVIE_ID")+". "+rs.getString("TITLE")
-                +" ( 장르 : "+rs.getString("GENRE")+", "+rs.getString("LIMIT_AGE")+"세 이용 관가)");
+            while (rs.next()) {
+                System.out.println(rs.getString("MOVIE_ID") + ". " + rs.getString("TITLE")
+                        + " ( 장르 : " + rs.getString("GENRE") + ", " + rs.getString("LIMIT_AGE") + "세 이용 관가)");
             }
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         closeConnection();
     }
-    public void showTimeTable(){
+
+    public void showTimeTable() {
         this.getConnection();
-        try{
+        try {
             pstmt = conn.prepareStatement("SELECT TO_CHAR(start_time, 'HH24:MI') " +
                     "AS start_time FROM showTime GROUP BY TO_CHAR(start_time, 'HH24:MI')");
 
             rs = pstmt.executeQuery();
             while (rs.next()) {
-                System.out.println("상영 시작 시간: " +  rs.getString("start_time"));
+                System.out.println("상영 시작 시간: " + rs.getString("start_time"));
             }
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         closeConnection();
     }
-    public void showSeatsTable(int showTimeId){
+
+    public void showSeatsTable(int showTimeId) {
         this.getConnection();
-        try{
+        try {
             pstmt = conn.prepareStatement("SELECT s.seat_row, s.seat_number, " +
                     "       CASE WHEN r.status = 1 THEN '*' ELSE 'ㅁ' END AS seat_status" +
                     "FROM Seats s" +
@@ -179,7 +188,7 @@ public class JdbcDAO {
                 String seatStatus = rs.getString("seat_status");
                 System.out.println(seatRow + seatNumber + ": " + seatStatus);
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         closeConnection();

@@ -1,17 +1,19 @@
 package users;
 
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 @AllArgsConstructor
 public class UsersDTO {
 
     @NonNull
-    private String user_id;
+    private String userID;
     @NonNull
-    private String password;
+    private String userPassword;
     @NonNull
-    private int age;
+    private int userAge;
 
 }
