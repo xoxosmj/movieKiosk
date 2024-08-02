@@ -13,4 +13,5 @@ public interface ReservationService {
 
     public void calCharge();
     public void cancelReservation(int reservationId);
+
 }

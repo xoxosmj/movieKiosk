@@ -57,7 +57,7 @@ public class JdbcDAO {
 
 
     // USERS
-    public void checkDuplicate(String id, String password) {
+    public void checkDuplicate(String id) {
         try {
             pstmt = conn.prepareStatement("select * from users where user_id=?");
             pstmt.setString(1, id);
@@ -66,14 +66,25 @@ public class JdbcDAO {
         }
     }
 
+    private void checkPassword(String id, String password) {
+        try {
+            pstmt = conn.prepareStatement("select * from users where user_id=? And password=?");
+            pstmt.setString(1, id);
+            pstmt.setString(2, password);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public void join(UsersDTO usersDTO) {
         this.getConnection();
         try {
-            checkDuplicate(usersDTO.getUserId(), usersDTO.getUserPassword());
+            checkDuplicate(usersDTO.getUserId());
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                System.out.println("이미 기존에 있는 회원입니다.");
+                System.out.println("이미 가입된 아이디입니다.\n");
             } else {
                 try {
                     pstmt = conn.prepareStatement("INSERT INTO users (user_id, password, age) VALUES (?, ?, ?)");
@@ -102,19 +113,20 @@ public class JdbcDAO {
     public void login(String id, String password) {
         this.getConnection();
         try {
-            checkDuplicate(id, password);
+            checkPassword(id, password);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
                 System.out.println("로그인에 성공합니다.\n");
             } else {
-                System.out.println("존재하지 않는 회원입니다.\n");
+                System.out.println("아이디 혹은 비밀번호가 맞지 않습니다.\n");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         closeConnection();
     }
+
 
     public void showTheaterList() {
         this.getConnection();

@@ -84,7 +84,9 @@ public class ReservationServiceImpl implements ReservationService {
                     break;
 
                 } else {
-                    System.out.println("이미 예약된 좌석입니다");
+                    System.out.println("==============================");
+                    System.out.println("\t이미 예약된 좌석입니다\t");
+                    System.out.println("==============================");
 
                 }
             }
@@ -92,6 +94,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 
     }
+
 
     @Override
     public void calCharge() {

@@ -10,5 +10,6 @@ public class ReservationMain {
         reservationService.selectShowTime();
         reservationService.insertPeopleNumber();
         reservationService.selectSeats();
+
     }
 }

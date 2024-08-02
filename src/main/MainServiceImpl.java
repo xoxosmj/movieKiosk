@@ -11,7 +11,7 @@ import java.util.Scanner;
 @RequiredArgsConstructor
 public class MainServiceImpl implements MainService {
     private final UsersService userService;
-    private Scanner scanner = new Scanner(System.in);
+    private Scanner sc = new Scanner(System.in);
     private boolean end = false;
 
     @Override
@@ -41,7 +41,7 @@ public class MainServiceImpl implements MainService {
         while (true) {
             try {
                 if (exit) break;
-                int select = scanner.nextInt();
+                int select = sc.nextInt();
 
                 switch (select) {
                     case 1:
@@ -61,7 +61,7 @@ public class MainServiceImpl implements MainService {
                 }
             } catch (InputMismatchException e) {
                 System.out.println("잘못된 입력값입니다. 다시 입력해주세요");
-                scanner.nextLine();
+                sc.nextLine();
             }
 
         }
