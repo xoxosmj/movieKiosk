@@ -3,6 +3,7 @@ package main;
 
 import lombok.RequiredArgsConstructor;
 import reservation.ReservationMain;
+import reservation.ReservationServiceImpl;
 import users.UsersService;
 
 import java.util.Scanner;
@@ -17,19 +18,19 @@ public class MainServiceImpl implements MainService {
     public void execute() {
         while (true) {
 
-            String returnId = loginPage();
+            String resultId = loginPage();
 
-            if (returnId.equals("")) {
+            if (resultId.equals("")) {
                 System.out.println("프로그램 종료");
                 return;
             }
-            ReservationMain reservationMain = new ReservationMain();
-            reservationMain.Reservation(returnId);
+            ReservationServiceImpl reservationService = new ReservationServiceImpl();
+            reservationService.reservationTask(resultId);
         }
     }
 
     public String loginPage() {
-        String returnId;
+        String resultId;
 
         while (true) {
             System.out.println("*************************************");
@@ -49,15 +50,15 @@ public class MainServiceImpl implements MainService {
                     return "";
 
                 case 1:
-                    returnId = userService.login();
-                    if (!returnId.equals("")) {
-                        return returnId;
+                    resultId = userService.login();
+                    if (!resultId.equals("")) {
+                        return resultId;
                     }
                     break;
                 case 2:
-                    returnId = userService.join();
-                    if (!returnId.equals("")) {
-                        return returnId;
+                    resultId = userService.join();
+                    if (!resultId.equals("")) {
+                        return resultId;
                     }
                     break;
                 default:

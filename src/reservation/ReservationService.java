@@ -1,17 +1,21 @@
 package reservation;
 
 public interface ReservationService {
-    public void selectTheater();
 
-    public void selectMovie();
+    void reservationTask(String resultId);
 
-    public void selectShowTime();
+    void selectTheater();
 
-    public void insertPeopleNumber();
+    void selectMovie();
 
-    public void selectSeats();
+    void selectShowTime();
 
-    public void calCharge();
-    public void cancelReservation(int reservationId);
+    void insertPeopleNumber();
+
+    void selectSeats();
+
+    void calCharge();
+
+    void cancelReservation(int reservationId);
 
 }

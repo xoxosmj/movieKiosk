@@ -101,7 +101,7 @@ public class JdbcDAO {
 
                     } else {
                         System.out.println("회원가입에 실패하였습니다.\n");
-                        result =  false;
+                        result = false;
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -125,10 +125,10 @@ public class JdbcDAO {
 
             if (rs.next()) {
                 System.out.println("로그인에 성공합니다.\n");
-                result= true;
+                result = true;
             } else {
                 System.out.println("아이디 혹은 비밀번호가 맞지 않습니다.\n");
-                result= false;
+                result = false;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -148,6 +148,9 @@ public class JdbcDAO {
                 System.out.println(rs.getString("THEATER_ID") + ". " + rs.getString("NAME")
                         + " (" + rs.getString("LOCATION") + ")");
             }
+
+            System.out.println("영화관을 선택하세요 : ");
+
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -223,7 +226,6 @@ public class JdbcDAO {
             pstmt.setInt(1, showtimeId);
             rs = pstmt.executeQuery();
             int enter = 0;
-            int row = 0;
             char nextChar = 'A';
 
             System.out.println("   01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20");
@@ -259,30 +261,38 @@ public class JdbcDAO {
     }
 
 
-    public boolean reservation(ReservationDTO.ShowtimeIdDTO showtimeIdDTO, int showtimeId, String seatRow, int seatNum) {
+    public boolean reservation(ReservationDTO reservationDTO, int showtimeId, String seatRow, int seatNum) {
         this.getConnection();
         int seat_id = -1;
         int showtime_seat_id = -1;
         boolean reserved = false;
         try {
             pstmt = conn.prepareStatement("select seat_id from seats where theater_id = ? and seat_row = ? and seat_number = ?");
-            pstmt.setInt(1, showtimeIdDTO.getTheaterId());
+            pstmt.setInt(1, reservationDTO.getTheaterId());
             pstmt.setString(2, seatRow);
             pstmt.setInt(3, seatNum);
             rs = pstmt.executeQuery();
+
             while (rs.next()) {
                 seat_id = rs.getInt("seat_id");
                 System.out.println(seat_id);
             }
+
             pstmt = conn.prepareStatement("select showtime_seat_id from showtime_seat where showtime_id=? and seat_id = ? and status = 1");
             pstmt.setInt(1, showtimeId);
             pstmt.setInt(2, seat_id);
             rs = pstmt.executeQuery();
+
             while (rs.next()) {
                 showtime_seat_id = rs.getInt("showtime_seat_id");
                 System.out.println(showtime_seat_id);
                 pstmt = conn.prepareStatement("UPDATE Showtime_Seat SET status = 0 WHERE showtime_seat_id = ?");
                 pstmt.setInt(1, showtime_seat_id);
+                pstmt.execute();
+
+                pstmt = conn.prepareStatement("INSERT INTO reservation VALUES (reservation_seq.nextval,?, ?, sysdate,1)");
+                pstmt.setInt(1, showtime_seat_id);
+                pstmt.setString(2, reservationDTO.getUserId());
                 pstmt.execute();
                 reserved = true;
             }

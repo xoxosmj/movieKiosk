@@ -7,16 +7,30 @@ import java.util.Scanner;
 public class ReservationServiceImpl implements ReservationService {
     private Scanner sc = new Scanner(System.in);
     private int num;
-    private ReservationDTO.ShowtimeIdDTO showtimeIdDTO = new ReservationDTO.ShowtimeIdDTO();
+    private ReservationDTO reservationDTO = new ReservationDTO();
     private int showtimeId;
+
+
+    @Override
+    public void reservationTask(String resultId) {
+        reservationDTO.setUserId(resultId);
+        selectTheater();
+        selectMovie();
+        selectShowTime();
+        insertPeopleNumber();
+        selectSeats();
+        //System.out.println("디버깅"+"\n"+reservationDTO.getMovieId()+"\n"+reservationDTO.getTheaterId()+"\n"+reservationDTO.getTime()+"\n"+reservationDTO.getUserId());
+
+        calCharge();
+
+    }
 
     @Override
     public void selectTheater() {
         System.out.println();
         JdbcDAO.getInstance().showTheaterList();
-        System.out.print("영화관을 선택하세요 : ");
         int theaterId = sc.nextInt();
-        showtimeIdDTO.setTheaterId(theaterId);
+        reservationDTO.setTheaterId(theaterId);
     }
 
     @Override
@@ -25,7 +39,7 @@ public class ReservationServiceImpl implements ReservationService {
         JdbcDAO.getInstance().showMovieList();
         System.out.print("영화를 선택하세요 : ");
         int movieId = sc.nextInt();
-        showtimeIdDTO.setMovieId(movieId);
+        reservationDTO.setMovieId(movieId);
 
     }
 
@@ -51,8 +65,8 @@ public class ReservationServiceImpl implements ReservationService {
                 throw new IllegalArgumentException("옳지 않은 입력값입니다");
         }
 
-        showtimeIdDTO.setTime(timeString);
-        showtimeId = JdbcDAO.getInstance().getShowtimeId(showtimeIdDTO.getMovieId(), showtimeIdDTO.getTheaterId(), timeString);
+        reservationDTO.setTime(timeString);
+        showtimeId = JdbcDAO.getInstance().getShowtimeId(reservationDTO.getMovieId(), reservationDTO.getTheaterId(), timeString);
     }
 
     @Override
@@ -60,6 +74,7 @@ public class ReservationServiceImpl implements ReservationService {
         System.out.print("예매할 인원 수를 입력하세요 : ");
         num = sc.nextInt();
         System.out.println(num + "명의 좌석선택을 진행합니다");
+        //나이 입력 받고 예외처리 필요
 
     }
 
@@ -71,13 +86,14 @@ public class ReservationServiceImpl implements ReservationService {
             while (true) {
 
                 JdbcDAO.getInstance().showSeatsTable(showtimeId);
-                System.out.print("좌석의 행을 입력하세요(A,B,C,,,G) : ");
-                String seatRow = sc.next();
-                System.out.print("좌석의 열을 입력하세요(1,2,3,,,20) : ");
-                int seatNum = sc.nextInt();
+                System.out.print("좌석을 입력하세요(A1,A2,,,): ");
+                String seat = sc.next().toUpperCase();
+                String seatRow = seat.substring(0, 1);
+                int seatNum = Integer.parseInt(seat.substring(1));
 
+                //예외처리 필요
 
-                reserved = JdbcDAO.getInstance().reservation(showtimeIdDTO, showtimeId, seatRow, seatNum);
+                reserved = JdbcDAO.getInstance().reservation(reservationDTO, showtimeId, seatRow, seatNum);
 
                 if (reserved) {
                     System.out.println("예약 완료");
@@ -95,14 +111,27 @@ public class ReservationServiceImpl implements ReservationService {
 
     }
 
-
     @Override
     public void calCharge() {
+        int charge = 0;
+        if(reservationDTO.getTime().equals("08:00")){
+            charge = 7500;
+        }
+        else{
+            charge = 15000;
+        }
+        System.out.println("==============================");
+        System.out.println();
+        System.out.println(num+"명의 요금은 "+num*charge+"원 입니다.");
+
 
     }
+
 
     @Override
     public void cancelReservation(int reservationId) {
 
     }
+
+
 }
